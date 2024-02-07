@@ -26,9 +26,11 @@ config = { version = "0.13.4", features = [] }
 tower-http = { version = "0.5.1", features = ["sensitive-headers", "trace", "util", "request-id"] }
 tower = "0.4.13"
 validator = { version = "0.16.1", features = ["derive"] }
-axum-valid = { version = "0.15.0", features = ["422"] }
+axum-valid = { version = "0.15.0", features = ["422", "into_json"] }
+time = { version = "0.3.34", features = ["serde", "formatting"] }
 
 [dev-dependencies]
 reqwest = { version = "0.11.23", features = ["json"] }
 serde_json = "1.0.111"
+assert-json-diff = "2.0.2"
 ulid = "1.1.0"
