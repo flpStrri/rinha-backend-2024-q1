@@ -1,0 +1,24 @@
+version: '3.1'
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - "27017:27017"
+  api:
+    build: .
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+    environment:
+      RUST_LOG: "info"
+      APP_DATABASE__HOST: "mongo"
+      APP_DATABASE__PORT: 27017
+      APP_DATABASE__USERNAME: "root"
+      APP_DATABASE__PASSWORD: "example"
+      APP_DATABASE__DATABASE_NAME: "test"
+
