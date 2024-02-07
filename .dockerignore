@@ -1,0 +1,11 @@
+target
+tests
+.github
+Dockerfile
+.dockerignore
+.git
+.gitignore
+docker-compose.yml
+integration-env.yml
+LICENSE
+README.md

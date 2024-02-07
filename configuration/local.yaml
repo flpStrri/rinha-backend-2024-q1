@@ -1,0 +1,7 @@
+application_port: 0
+database:
+  host: "127.0.0.1"
+  port: 27017
+  username: "root"
+  password: "example"
+  database_name: "test"
