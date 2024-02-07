@@ -2,6 +2,10 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use validator::Validate;
+
+use crate::structs::transaction;
+
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct CreatePersonBody {
     #[serde(rename(deserialize = "apelido", serialize = "apelido"))]
@@ -32,4 +36,23 @@ pub struct PersonBody {
     pub birth_date: NaiveDate,
     #[serde(rename(serialize = "stack", deserialize = "stack"))]
     pub stacks: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Validate, PartialEq)]
+pub struct Transaction {
+    #[serde(rename(serialize = "valor", deserialize = "valor"))]
+    pub value: u64,
+    #[serde(rename(serialize = "descricao", deserialize = "descricao"))]
+    #[validate(length(min = 1, max = 10))]
+    pub description: String,
+    #[serde(rename(serialize = "tipo", deserialize = "tipo"))]
+    pub action: transaction::Action,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, PartialEq)]
+pub struct Balance {
+    #[serde(rename(serialize = "limite", deserialize = "limite"))]
+    pub limit: u64,
+    #[serde(rename(serialize = "saldo", deserialize = "saldo"))]
+    pub balance: i64,
 }

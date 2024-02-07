@@ -55,6 +55,10 @@ impl Application {
             .route("/pessoas", post(routes::devs::create_person))
             .route("/pessoas", get(routes::devs::search_persons))
             .route("/contagem-pessoas", get(routes::count_devs::count_persons))
+            .route(
+                "/clientes/:id/transacoes",
+                post(routes::transaction::create_transaction),
+            )
             .layer(tracing_middleware)
             .route("/health-check", get(routes::health_check::health_check))
             .with_state(mongodb_pool);
