@@ -67,6 +67,33 @@ async fn returns_200_with_positive_balance_body_given_valid_credit() {
 }
 
 #[tokio::test]
+async fn returns_422_with_error_given_debit_larger_then_the_current_limit() {
+    let test_app = crate::helpers::spawn_app().await;
+    reqwest::Client::new()
+        .post(format!("{}/clientes", test_app.address))
+        .json(&serde_json::json!({
+            "id": 3,
+            "limite" : 50000
+        }))
+        .send()
+        .await
+        .expect("failed request");
+
+    let response = reqwest::Client::new()
+        .post(format!("{}/clientes/3/transacoes", test_app.address))
+        .json(&serde_json::json!({
+            "valor": 60000,
+            "tipo" : "d",
+            "descricao" : "new iPhone"
+        }))
+        .send()
+        .await
+        .expect("failed request");
+
+    assert_eq!(response.status(), StatusCode::UNPROCESSABLE_ENTITY);
+}
+
+#[tokio::test]
 async fn returns_422_with_error_body_given_a_too_long_description() {
     let test_app = crate::helpers::spawn_app().await;
 

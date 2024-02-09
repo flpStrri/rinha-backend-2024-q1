@@ -3,6 +3,7 @@ use std::net::{Ipv4Addr, SocketAddr};
 
 use axum::routing::{get, post};
 use axum::{http, Router};
+use mongodb::bson::doc;
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use tower::ServiceBuilder;
@@ -32,6 +33,9 @@ impl Application {
         let mongodb_pool = get_database_connection(static_config.database)
             .await
             .expect("failed to connect to mongodb");
+        migrate_database(&mongodb_pool)
+            .await
+            .expect("failed to migrate database");
 
         let sensitive_headers: std::sync::Arc<[_]> =
             vec![http::header::AUTHORIZATION, http::header::COOKIE].into();
@@ -85,6 +89,32 @@ pub async fn get_database_connection(
     let client_options = ClientOptions::parse(database_config.connection_string()).await?;
     let client = Client::with_options(client_options)?;
     Ok(client.database(&database_config.database_name))
+}
+
+pub async fn migrate_database(database: &Database) -> Result<(), mongodb::error::Error> {
+    let validation = doc! {
+            "$and": [
+                {
+                    "$jsonSchema": {
+                        "bsonType": "object",
+                        "title": "Customer Object Validation",
+                        "required": [ "limit", "balance" ]
+                    }
+                },
+                {
+                    "$expr": {
+                        "$lt": [ "$limit", "$balance" ]
+                    }
+                }
+            ]
+    };
+    let options = mongodb::options::CreateCollectionOptions::builder()
+        .validator(Some(validation))
+        .build();
+
+    database.create_collection("banking", options).await?;
+
+    Ok(())
 }
 
 #[derive(Clone, Copy)]

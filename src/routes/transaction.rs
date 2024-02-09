@@ -2,11 +2,12 @@ use axum::extract::{Path, State};
 use axum::http::header;
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use axum_valid::Valid;
+use mongodb;
 use mongodb::options::{FindOneAndUpdateOptions, FindOneOptions};
 use mongodb::{bson::doc, Collection, Database};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
-use tracing::error;
+use tracing::{error, info};
 
 use crate::structs::{api, customer};
 
@@ -54,8 +55,19 @@ pub async fn create_transaction(
         Ok(None) => Err(StatusCode::NOT_FOUND),
         Err(error) => {
             dbg!(&error);
-            error!("unexpected error on query: {}", error);
-            Err(StatusCode::INTERNAL_SERVER_ERROR)
+            match error.kind.as_ref() {
+                mongodb::error::ErrorKind::Command(mongodb::error::CommandError {
+                    code: 121,
+                    ..
+                }) => {
+                    info!("transaction failed: customer {} has insufficient funds", id);
+                    return Err(StatusCode::UNPROCESSABLE_ENTITY);
+                }
+                _ => {
+                    error!("unexpected error on query: {}", error);
+                    Err(StatusCode::INTERNAL_SERVER_ERROR)
+                }
+            }
         }
     }
 }
