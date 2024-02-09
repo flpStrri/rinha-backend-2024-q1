@@ -13,7 +13,7 @@ pub async fn create_customer(
 ) -> impl IntoResponse {
     let customer = customer::Customer {
         id: body.id,
-        limit: body.limit,
+        limit: -body.limit,
         balance: 0,
         transactions: vec![],
     };
@@ -28,7 +28,7 @@ pub async fn create_customer(
             ],
             Json(api::CustomerBody {
                 id: customer.id,
-                limit: customer.limit,
+                limit: -customer.limit,
             }),
         )),
         Err(error) => {

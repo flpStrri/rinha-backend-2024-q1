@@ -49,7 +49,7 @@ pub async fn create_transaction(
             [(header::CONTENT_TYPE, "application/json")],
             Json(api::BalanceBody {
                 balance: customer.balance,
-                limit: customer.limit,
+                limit: -customer.limit,
             }),
         )),
         Ok(None) => Err(StatusCode::NOT_FOUND),
