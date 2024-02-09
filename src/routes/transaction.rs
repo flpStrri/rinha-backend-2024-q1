@@ -2,13 +2,12 @@ use axum::extract::{Path, State};
 use axum::http::header;
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use axum_valid::Valid;
-use mongodb::options::FindOneAndUpdateOptions;
+use mongodb::options::{FindOneAndUpdateOptions, FindOneOptions};
 use mongodb::{bson::doc, Collection, Database};
 use time::format_description::well_known::Rfc3339;
 use time::OffsetDateTime;
 use tracing::error;
 
-use crate::structs::transaction::Action;
 use crate::structs::{api, customer};
 
 #[tracing::instrument(name = "Creating a new transaction", skip(client, body))]
@@ -61,29 +60,46 @@ pub async fn create_transaction(
     }
 }
 
-#[tracing::instrument(name = "Looking for a customer statement", skip(_client))]
+#[tracing::instrument(name = "Looking for a customer statement", skip(client))]
 pub async fn get_statement(
-    State(_client): State<Database>,
-    Path(id): Path<u64>,
+    State(client): State<Database>,
+    Path(id): Path<u32>,
 ) -> impl IntoResponse {
-    match id {
-        6 => Err(StatusCode::NOT_FOUND),
-        _ => Ok((
+    let customer_store: Collection<customer::Customer> = client.collection("banking");
+    let projection = doc! {
+        "transactions": { "$slice":  -10 }
+    };
+    let options = FindOneOptions::builder()
+        .projection(Some(projection))
+        .build();
+    let queried_customer = customer_store.find_one(doc! {"_id": id}, options).await;
+
+    match queried_customer {
+        Ok(Some(customer)) => Ok((
             StatusCode::OK,
             [(header::CONTENT_TYPE, "application/json")],
             Json(api::StatementBody {
                 balance: api::FullBalanceBody {
-                    balance: -9098,
-                    limit: 100000,
+                    balance: customer.balance,
+                    limit: -customer.limit,
                     timestamp: OffsetDateTime::now_utc(),
                 },
-                transactions: Vec::from([api::TransactionBody {
-                    description: String::from("whatever"),
-                    value: 10,
-                    action: Action::Credit,
-                    timestamp: OffsetDateTime::now_utc(),
-                }]),
+                transactions: customer
+                    .transactions
+                    .iter()
+                    .map(|transaction| api::TransactionBody {
+                        value: transaction.value,
+                        action: transaction.action.clone(),
+                        description: transaction.description.clone(),
+                        timestamp: transaction.timestamp,
+                    })
+                    .collect(),
             }),
         )),
+        Ok(None) => Err(StatusCode::NOT_FOUND),
+        Err(error) => {
+            println!("get_by_id: {}", error);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
     }
 }
