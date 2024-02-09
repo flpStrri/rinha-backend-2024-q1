@@ -51,10 +51,6 @@ impl Application {
             .sensitive_response_headers(sensitive_headers);
 
         let app = Router::new()
-            .route("/pessoas/:id", get(routes::devs::get_person))
-            .route("/pessoas", post(routes::devs::create_person))
-            .route("/pessoas", get(routes::devs::search_persons))
-            .route("/contagem-pessoas", get(routes::count_devs::count_persons))
             .route(
                 "/clientes/:id/transacoes",
                 post(routes::transaction::create_transaction),
