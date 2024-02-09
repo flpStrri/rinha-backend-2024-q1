@@ -1,10 +1,10 @@
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 pub struct StaticConfiguration {
     pub database: DatabaseConfiguration,
     pub application_port: u16,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 pub struct DatabaseConfiguration {
     pub username: String,
     pub password: String,

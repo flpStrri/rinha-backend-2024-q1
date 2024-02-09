@@ -63,6 +63,7 @@ impl Application {
                 "/clientes/:id/extrato",
                 get(routes::transaction::get_statement),
             )
+            .route("/clientes", post(routes::customers::create_customer))
             .layer(tracing_middleware)
             .route("/health-check", get(routes::health_check::health_check))
             .with_state(mongodb_pool);
