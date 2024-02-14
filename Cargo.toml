@@ -1,6 +1,6 @@
 [package]
 name = "rinha-backend-2023-q3"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 
 [lib]
