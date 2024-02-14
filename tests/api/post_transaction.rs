@@ -34,6 +34,40 @@ async fn returns_200_with_negative_balance_body_given_a_valid_debit() {
 }
 
 #[tokio::test]
+async fn returns_200_with_negative_balance_body_given_a_valid_debit_with_value_equals_to_current_limit(
+) {
+    let test_app = crate::helpers::spawn_app().await;
+    reqwest::Client::new()
+        .post(format!("{}/clientes", test_app.address))
+        .json(&serde_json::json!({
+            "id": 1,
+            "limite" : 1000
+        }))
+        .send()
+        .await
+        .expect("failed request");
+
+    let response = reqwest::Client::new()
+        .post(format!("{}/clientes/1/transacoes", test_app.address))
+        .json(&serde_json::json!({
+            "valor": 1000,
+            "tipo" : "d",
+            "descricao" : "descricao"
+        }))
+        .send()
+        .await
+        .expect("failed request");
+
+    assert_eq!(response.status(), StatusCode::OK);
+    let response_body = response
+        .json::<std::collections::HashMap<String, serde_json::Value>>()
+        .await
+        .unwrap();
+    assert_eq!(response_body["saldo"], -1000);
+    assert_eq!(response_body["limite"], 1000);
+}
+
+#[tokio::test]
 async fn returns_200_with_positive_balance_body_given_valid_credit() {
     let test_app = crate::helpers::spawn_app().await;
     reqwest::Client::new()

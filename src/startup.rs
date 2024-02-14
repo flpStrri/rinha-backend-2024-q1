@@ -103,7 +103,7 @@ pub async fn migrate_database(database: &Database) -> Result<(), mongodb::error:
                 },
                 {
                     "$expr": {
-                        "$lt": [ "$limit", "$balance" ]
+                        "$lte": [ "$limit", "$balance" ]
                     }
                 }
             ]
