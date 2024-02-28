@@ -20,7 +20,7 @@ serde = { version = "1.0", features = ["derive"] }
 mongodb = { version = "2.8", features = ["bson-uuid-1"] }
 uuid = { version = "1.7", features = ["serde", "v4"] }
 config = { version = "0.13.4", features = [] }
-tower-http = { version = "0.5.1", features = ["sensitive-headers", "trace", "util", "request-id"] }
+tower-http = { version = "0.5.2", features = ["sensitive-headers", "trace", "util", "request-id"] }
 tower = "0.4.13"
 validator = { version = "0.16.1", features = ["derive"] }
 axum-valid = { version = "0.15.0", features = ["422", "into_json"] }
