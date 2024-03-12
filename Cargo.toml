@@ -27,7 +27,7 @@ axum-valid = { version = "0.15.0", features = ["422", "into_json"] }
 time = { version = "0.3.34", features = ["serde", "formatting"] }
 
 [dev-dependencies]
-reqwest = { version = "0.11.23", features = ["json"] }
+reqwest = { version = "0.11.25", features = ["json"] }
 serde_json = "1.0.114"
 assert-json-diff = "2.0.2"
 ulid = "1.1.0"
