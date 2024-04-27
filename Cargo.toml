@@ -24,7 +24,7 @@ tower-http = { version = "0.5.2", features = ["sensitive-headers", "trace", "uti
 tower = "0.4.13"
 validator = { version = "0.16.1", features = ["derive"] }
 axum-valid = { version = "0.15.0", features = ["422", "into_json"] }
-time = { version = "0.3.34", features = ["serde", "formatting"] }
+time = { version = "0.3.36", features = ["serde", "formatting"] }
 
 [dev-dependencies]
 reqwest = { version = "0.12.4", features = ["json"] }
