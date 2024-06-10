@@ -22,7 +22,7 @@ uuid = { version = "1.8", features = ["serde", "v4"] }
 config = { version = "0.13.4", features = [] }
 tower-http = { version = "0.5.2", features = ["sensitive-headers", "trace", "util", "request-id"] }
 tower = "0.4.13"
-validator = { version = "0.16.1", features = ["derive"] }
+validator = { version = "0.18.1", features = ["derive"] }
 axum-valid = { version = "0.15.0", features = ["422", "into_json"] }
 time = { version = "0.3.36", features = ["serde", "formatting"] }
 
